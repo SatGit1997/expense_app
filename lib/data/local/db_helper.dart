@@ -18,8 +18,10 @@ import 'model/user_model.dart';
 class DbHelper {
   //private constructor
   DbHelper._();
-
+  ///variable
   static final instance = DbHelper._();
+  /// function
+  // static DbHelper getInstance() => DbHelper._();
 
   Database ? uDB;
 
@@ -30,7 +32,7 @@ class DbHelper {
   static final String TABLE_COLUMN_EMAIL = "u_email";
   static final String TABLE_COLUMN_MOBILE = "u_mobile";
   static final String TABLE_COLUMN_PASSWORD = "u_password";
-  static final String TABLE_COLUMN_CREATED_AT = "u_created_at";
+  static final String TABLE_COLUMN_C_PASSWORD = "u_c_password";
 
 
   /// expanse table
@@ -53,49 +55,51 @@ class DbHelper {
 
   /// openDB
   Future<Database> openDB() async {
-    var appDir = await getApplicationDocumentsDirectory();
+    var appDir = await getApplicationCacheDirectory();
     var dbPath = join(appDir.path, "expenseDB.db");
     return openDatabase(dbPath, version: 1, onCreate: (db, version) {
       print("Db created!!");
 
       // user table sql
       db.execute(
-          "created table $TABLE_USER ( $TABLE_ID integer primary key autoincrement $TABLE_COLUMN_USERNAME text not null, $TABLE_COLUMN_EMAIL text not null, $TABLE_COLUMN_MOBILE text not null, $TABLE_COLUMN_PASSWORD text not null, $TABLE_COLUMN_CREATED_AT text not null"
-      );
+          "create table $TABLE_USER ( $TABLE_ID integer primary key autoincrement, $TABLE_COLUMN_USERNAME text not null, $TABLE_COLUMN_EMAIL text not null, $TABLE_COLUMN_MOBILE text not null, $TABLE_COLUMN_PASSWORD text not null, $TABLE_COLUMN_C_PASSWORD text not null)");
 
 
       // expense table sql
       db.execute(
-          "create table $EXPENSE_TABLE ( $EXPENSE_ID integer primary key autoincrement, $TABLE_USER_ID integer, $EXPENSE_COLUMN_TABLE_TYPE integer, $EXPENSE_COLUMN_TITLE text not null, $EXPENSE_COLUMN_DESCRIPTION text not null, $EXPENSE_COLUMN_CREATED_AT text not null, $EXPENSE_COLUMN_AMOUNT real not null, $EXPENSE_COLUMN_CAT_ID integer"
-      );
+          "create table $EXPENSE_TABLE ( $EXPENSE_ID integer primary key autoincrement, $TABLE_USER_ID integer, $EXPENSE_COLUMN_TABLE_TYPE integer, $EXPENSE_COLUMN_TITLE text not null, $EXPENSE_COLUMN_DESCRIPTION text not null, $EXPENSE_COLUMN_CREATED_AT text not null, $EXPENSE_COLUMN_AMOUNT real not null, $EXPENSE_COLUMN_CAT_ID integer)");
     });
   }
 
 
   Future<bool> checkIfEmailAlreadyExists({required String email}) async {
-    Database db = await initDB();
+    var db = await initDB();
 
-    List<Map<String, dynamic>> Data = await db.query(
-        TABLE_USER, where: "$TABLE_COLUMN_EMAIL = ?", whereArgs: [email]);
-    return Data.isNotEmpty;
+    List<Map<String, dynamic>> data =
+    await db.query(TABLE_USER, where: "$TABLE_COLUMN_EMAIL = ?", whereArgs: [email]);
+
+    return data.isNotEmpty;
   }
 
 
   Future<bool> registerUser({required UserModel newUser}) async {
-    Database db = await initDB();
+    var db = await initDB();
     int rowsEffected = await db.insert(TABLE_USER, newUser.toMap());
     return rowsEffected > 0;
   }
 
 
-  Future<bool> authenticateUser(
-      {required String email, required String pass}) async {
-    Database db = await initDB();
+  Future<bool> authenticateUser({required String email, required String pass}) async {
+    var db = await initDB();
 
     List<Map<String, dynamic>> mData = await db.query(TABLE_USER,
-        where: "$TABLE_COLUMN_EMAIL = ? AND $TABLE_COLUMN_PASSWORD = ?",
-        whereArgs: [email, pass]);
-    if (mData.isNotEmpty) {
+        where: "$TABLE_COLUMN_EMAIL = ? AND  $TABLE_COLUMN_PASSWORD = ?",
+        whereArgs: [email, pass]
+    );
+
+
+    /// saving user id prefs
+    if (mData.isNotEmpty){
       var prefs = await SharedPreferences.getInstance();
       prefs.setString("userId", mData[0][TABLE_ID].toString());
     }

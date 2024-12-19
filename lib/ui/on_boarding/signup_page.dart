@@ -1,11 +1,63 @@
 
-import 'package:flutter/cupertino.dart';
+import 'package:expense_app/data/local/db_helper.dart';
+import 'package:expense_app/data/local/model/user_model.dart';
+import 'package:expense_app/domain/ui_helper.dart';
+
 import 'package:flutter/material.dart';
-import 'bottom_navigation_page.dart';
-import 'login_page.dart';
 
 
-class SignupPage extends StatelessWidget{
+
+class SignupPage extends StatefulWidget{
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+   TextEditingController userController = TextEditingController();
+
+   TextEditingController emailController = TextEditingController();
+
+   TextEditingController passController = TextEditingController();
+
+   TextEditingController cPassController = TextEditingController();
+
+   TextEditingController mobController = TextEditingController();
+
+   // DbHelper dbHelper = DbHelper.getInstance();
+   DbHelper dbHelper = DbHelper.instance;
+
+   bool isPassVisible = false;
+
+   bool isConPassVisible = false;
+
+   /// Create a function that returns InputDecoration
+
+   InputDecoration decorationtext(){
+     return InputDecoration(
+       labelText: "Username",
+       // Label for the input field
+       hintText: "Enter your username",
+       // Hint text inside the field
+       border: OutlineInputBorder(
+         borderRadius: BorderRadius.circular(8),
+       ),
+         enabledBorder: OutlineInputBorder(
+           // Border when not focused
+       borderRadius: BorderRadius.circular(8),
+         borderSide: BorderSide(color: Colors.purpleAccent, width: 2),
+        ),
+         focusedBorder: OutlineInputBorder(
+           // Border when focused
+        borderRadius: BorderRadius.circular(8),
+         borderSide: BorderSide(color: Colors.purpleAccent, width: 2),
+         ),
+       filled: true,
+       //Adds a fill color to the input field
+       fillColor: Colors.white
+     );
+   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +65,7 @@ class SignupPage extends StatelessWidget{
         padding: const EdgeInsets.all(28.0),
         child: Column(
           children: [
-            SizedBox(height: 10,),
+            mSpacer(),
             Text('Create Account',
               style: TextStyle(fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -27,7 +79,7 @@ class SignupPage extends StatelessWidget{
                   )
               ),
             ),
-            SizedBox(height: 10,),
+            mSpacer(),
             Text('Create an account so you can explore all the',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -42,25 +94,45 @@ class SignupPage extends StatelessWidget{
             )),
             SizedBox(height: 10,),
             TextField(
-              decoration: InputDecoration(
-                  label: Text('Email'),
-                  hintText: 'Enter a valid email here',
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                          color: Color(0xff6574d3)
-                      )
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(21),
-                      borderSide: BorderSide(
-                          color: Colors.green,
-                          width: 2
-                      )
-                  )
-              ),
+              controller: userController,
+              decoration: mFieldDecor(
+                  hint: "Enter a your name",
+                  heading: "Username")
             ),
-            SizedBox(height: 20,),
+            mSpacer(),
+            TextField(
+              controller: emailController,
+              decoration: mFieldDecor(
+                  hint: "Enter a valid email",
+                  heading: "Email")
+            ),
+            mSpacer(),
+            TextField(
+              controller: mobController,
+              keyboardType: TextInputType.number,
+              decoration: mFieldDecor(
+                  hint: "Enter your mob num..",
+                  heading: "Mobile"),
+
+            ),
+            mSpacer(),
+            TextField(
+              controller: passController,
+              obscuringCharacter: "*",
+
+              decoration: mFieldDecor(
+                  hint: "Enter a strong pass..",
+                  heading: "Password"),
+
+            ),
+            mSpacer(),
+            TextField(
+              controller: cPassController,
+              decoration: mFieldDecor(
+                  hint: "Enter again pass",
+                  heading: "Confirm Password"),
+            ),
+            /*SizedBox(height: 20,),
             TextField(
               decoration: InputDecoration(
                   label: Text('Password'),
@@ -100,23 +172,72 @@ class SignupPage extends StatelessWidget{
                   )
               ),
             ),
-            SizedBox(height: 20,),
-
-            SizedBox(height: 10,),
-            SizedBox(width: 300,
-              child: ElevatedButton(onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationPage() ));
-              },
-                child: Text('Sign in',style: TextStyle(fontSize: 20,color: Colors.white),
-                ),style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xff6574d3),
+            SizedBox(height: 20,),*/
 
 
-                ),),
-            ),
-            SizedBox(height: 40,),
+            mSpacer(mHeight: 25),
+
+
+            ElevatedButton(
+              onPressed: () async{
+
+              if(userController.text.isNotEmpty &&
+                  emailController.text.isNotEmpty &&
+                  mobController.text.isNotEmpty &&
+                  passController.text.isNotEmpty &&
+                  cPassController.text.isNotEmpty){
+
+                if(passController.text == cPassController.text){
+
+                  /// register user
+                  if(await dbHelper.checkIfEmailAlreadyExists(
+                      email: emailController.text.toString())){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Email already exits, login now"),backgroundColor: Colors.orangeAccent,));
+                  }
+                  else{
+                  bool check = await dbHelper.registerUser(
+                      newUser: UserModel(
+                          userName: userController.text,
+                          email: emailController.text,
+                          mobile: mobController.text,
+                          password: passController.text,
+                          cPassword: cPassController.text,
+                          ));
+                  if(check){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Account registered successfully!!"),backgroundColor: Colors.green,)
+                    );
+
+                    Navigator.pop(context);
+                  }else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Failed to register account, try again"),backgroundColor: Colors.red,
+                    ));
+                  }
+
+                  }
+                } else{
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Passwords doesn\'t match!!"), backgroundColor: Colors.orange,)
+                  );
+                }
+              }else{
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Please fill all the required blanks!!"),backgroundColor: Colors.orange,)
+                );
+              }
+
+            },
+              child: Text('Sign in',style: TextStyle(fontSize: 20,color: Colors.white),
+              ),style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xff6574d3),
+
+
+              ),),
+            mSpacer(mHeight: 10),
             InkWell(onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+              Navigator.pop(context);
             },
               child: Text('Already have an account',
                 style: TextStyle(
@@ -125,7 +246,7 @@ class SignupPage extends StatelessWidget{
                     color: Colors.blue
                 ),),
             ),
-            SizedBox(height: 10,),
+            mSpacer(mHeight: 15),
             Text('Or continue with',
               style: TextStyle(
                   fontSize: 14,

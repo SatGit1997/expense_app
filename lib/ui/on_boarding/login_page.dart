@@ -1,10 +1,19 @@
+import 'package:expense_app/data/local/db_helper.dart';
+import 'package:expense_app/domain/ui_helper.dart';
+import 'package:expense_app/ui/bottom_navi_pages/home_page.dart';
 import 'package:expense_app/ui/on_boarding/signup_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'bottom_navigation_page.dart';
-class LoginPage extends StatelessWidget{
+
+class LoginPage extends StatefulWidget{
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passController = TextEditingController();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(28.0),
@@ -32,70 +41,59 @@ class LoginPage extends StatelessWidget{
                   color: Colors.black,
                   fontSize: 20
               ),),
-            Text('been missed!',style: TextStyle(
+            Text('been missed!',
+                style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: 20
             )),
-            SizedBox(height: 10,),
+            mSpacer(),
             TextField(
-              decoration: InputDecoration(
-                  label: Text('Email'),
-                  hintText: 'Enter a valid email here',
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                          color: Colors.blue
-                      )
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(21),
-                      borderSide: BorderSide(
-                          color: Colors.green,
-                          width: 2
-                      )
-                  )
-              ),
+              decoration: mFieldDecor(
+                  hint: "Enter registered email",
+                  heading: "Email")
             ),
-            SizedBox(height: 30,),
+            mSpacer(mHeight: 20),
             TextField(
-              decoration: InputDecoration(
-                  label: Text('Password'),
-                  hintText: 'Enter 8 Digit password here',
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                          color: Colors.blue
-                      )
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(21),
-                      borderSide: BorderSide(
-                          color: Colors.green,
-                          width: 2
-                      )
-                  )
-              ),
+              decoration: mFieldDecor(hint: "Enter your registered pass!!", heading: "Password")
             ),
-            SizedBox(height: 20,),
+            mSpacer(mHeight: 20),
             Row(mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text('Forgot your password?',
                   style: TextStyle(color: Colors.blue),),
               ],
             ),
-            SizedBox(height: 20,),
-            SizedBox(width: 300,
-              child: ElevatedButton(onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomNavigationPage()));
+            mSpacer(mHeight: 20),
+            ElevatedButton(
+              onPressed: () async{
 
-              },
-                child: Text('Sign in',style: TextStyle(fontSize: 20,color: Colors.white),
-                ),style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xff6574d3),
+                DbHelper dbhelper = DbHelper.instance;
 
-                ),),
-            ),
+              if(emailController.text.isNotEmpty &&
+                  passController.text.isNotEmpty) {
+
+                if( await dbhelper.authenticateUser(
+                    email: emailController.text,
+                    pass: passController.text)){
+
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
+                }
+                 else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Invalid credentials, longin again!!")));
+                }
+              } else{
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Please fill all the required blanks!!")));
+              }
+            },
+              child: Text('Sign in',
+                style: TextStyle(fontSize: 20,color: Colors.white),
+              ),style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xff6574d3),
+
+              ),),
             SizedBox(height: 40,),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

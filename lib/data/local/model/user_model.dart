@@ -6,7 +6,8 @@ class UserModel{
   String email;
   String mobile;
   String password;
-  String createdAt;
+  String cPassword;
+
 
   UserModel(
       {this.id,
@@ -14,7 +15,8 @@ class UserModel{
         required this.email,
         required this.mobile,
         required this.password,
-        required this.createdAt,
+        required this.cPassword,
+
       });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -24,7 +26,8 @@ class UserModel{
         email: map[DbHelper.TABLE_COLUMN_EMAIL],
         mobile: map[DbHelper.TABLE_COLUMN_MOBILE],
         password: map[DbHelper.TABLE_COLUMN_PASSWORD],
-        createdAt: map[DbHelper.TABLE_COLUMN_CREATED_AT]);
+        cPassword: map[DbHelper.TABLE_COLUMN_C_PASSWORD],
+        );
   }
 
   Map<String, dynamic> toMap(){
@@ -33,7 +36,8 @@ class UserModel{
       DbHelper.TABLE_COLUMN_EMAIL : email,
       DbHelper.TABLE_COLUMN_MOBILE : mobile,
       DbHelper.TABLE_COLUMN_PASSWORD : password,
-      DbHelper.TABLE_COLUMN_CREATED_AT : createdAt,
+      DbHelper.TABLE_COLUMN_C_PASSWORD : cPassword,
+
     };
   }
 }

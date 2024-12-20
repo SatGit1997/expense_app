@@ -1,8 +1,10 @@
 import 'package:expense_app/data/local/db_helper.dart';
 import 'package:expense_app/domain/ui_helper.dart';
 import 'package:expense_app/ui/bottom_navi_pages/home_page.dart';
+import 'package:expense_app/ui/on_boarding/dashboard_page.dart';
 import 'package:expense_app/ui/on_boarding/signup_page.dart';
 import 'package:flutter/material.dart';
+
 
 class LoginPage extends StatefulWidget{
   @override
@@ -49,12 +51,14 @@ class _LoginPageState extends State<LoginPage> {
             )),
             mSpacer(),
             TextField(
+              controller: emailController,
               decoration: mFieldDecor(
                   hint: "Enter registered email",
                   heading: "Email")
             ),
             mSpacer(mHeight: 20),
             TextField(
+              controller: passController,
               decoration: mFieldDecor(hint: "Enter your registered pass!!", heading: "Password")
             ),
             mSpacer(mHeight: 20),
@@ -77,7 +81,9 @@ class _LoginPageState extends State<LoginPage> {
                     email: emailController.text,
                     pass: passController.text)){
 
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
+                  Navigator.pushReplacement(
+                      context, MaterialPageRoute(
+                    builder: (context) => DashboardPage(),));
                 }
                  else {
                   ScaffoldMessenger.of(context).showSnackBar(

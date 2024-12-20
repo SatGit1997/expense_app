@@ -2,7 +2,7 @@ import 'package:expense_app/data/local/db_helper.dart';
 class ExpenseModel{
   int? id;
   int userId;
-  int expenseType;
+  String expenseType;
   String title;
   String desc;
   String createdAt;

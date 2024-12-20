@@ -1,4 +1,6 @@
 
+import 'package:expense_app/ui/bottom_navi_pages/home_page.dart';
+import 'package:expense_app/ui/intro_page.dart';
 import 'package:expense_app/ui/splash_page.dart';
 import 'package:flutter/material.dart';
 

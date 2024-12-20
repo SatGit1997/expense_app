@@ -6,18 +6,18 @@ import '../bottom_navi_pages/home_page.dart';
 import '../bottom_navi_pages/profile_page.dart';
 import '../bottom_navi_pages/notification_page.dart';
 
-class BottomNavigationPage extends StatefulWidget{
+class DashboardPage extends StatefulWidget{
   @override
-  State<BottomNavigationPage> createState() => _BottomNavigationPageState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _BottomNavigationPageState extends State<BottomNavigationPage> {
+class _DashboardPageState extends State<DashboardPage> {
   int selectedIndex = 0;
 
   List<Widget>navPages = [
     HomePage(),
     ExpencePage(),
-    AddPage(),
+    AddExpensePage(),
     NotificationPage(),
     ProfilePage()
   ];

@@ -1,9 +1,40 @@
 
 
+import 'dart:async';
+
+import 'package:expense_app/ui/on_boarding/dashboard_page.dart';
+import 'package:expense_app/ui/on_boarding/login_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class IntroPage extends StatelessWidget{
+class IntroPage extends StatefulWidget{
+  @override
+  State<IntroPage> createState() => _IntroPageState();
+}
+
+class _IntroPageState extends State<IntroPage> {
+  String? uid;
+
+  @override
+  void initState() {
+    super.initState();
+    Timer(Duration(seconds: 4),() async{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      uid = prefs.getString("userId") ?? "";
+
+      Widget navigateTo = LoginPage();
+
+      if(uid!= ""){
+        navigateTo = DashboardPage();
+      }
+
+      Navigator.pushReplacement(context, MaterialPageRoute(builder:  (context) => navigateTo));
+
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

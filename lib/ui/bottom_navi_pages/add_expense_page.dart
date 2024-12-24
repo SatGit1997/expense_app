@@ -85,7 +85,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   );*/
                   return
                     DropdownMenu(
-                        width: 354,
+                        width: 379,
                         menuStyle: MenuStyle(),
                     // width: double.infinity,
                     inputDecorationTheme: InputDecorationTheme(

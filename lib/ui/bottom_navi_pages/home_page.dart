@@ -1,8 +1,16 @@
+import 'dart:math';
+
+import 'package:expense_app/domain/app_constants.dart';
+import 'package:expense_app/domain/ui_helper.dart';
 import 'package:expense_app/ui/bloc/expense_bloc.dart';
+import 'package:expense_app/ui/bloc/expense_event.dart';
 import 'package:expense_app/ui/bloc/expense_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+
+import '../../data/local/model/expense_model.dart';
 
 class HomePage extends StatefulWidget{
   @override
@@ -11,94 +19,97 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
+  List<ExpenseModel> mExpense = [];
+  
+  DateFormat dFormat = DateFormat.yMMMd();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ExpenseBloc>().add(FetchInitialExpenseEvent());
+  }
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(21.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
           children: [
             /// logo image
             Center(
-              child: SizedBox(
-                height: 40,
-                  child: Image(image: AssetImage("assets/images/home_logo_gb.png"),)),
+              child: Image.asset("assets/images/home_logo_gb.png",fit: BoxFit.contain,width: 120,)
             ),
 
-            SizedBox(height: 10,),
+
+            mSpacer(),
 
             /// profile bar
-            Expanded(
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start,
+            Row(crossAxisAlignment: CrossAxisAlignment.start,
 
-                children: [
-                  Expanded(flex: 2,
-                    child: CircleAvatar(
-                      foregroundImage: AssetImage("assets/images/avitar_profile.jpg",),),
+              children: [
+                Expanded(
+                  child:CircleAvatar(backgroundImage: AssetImage("assets/images/avitar_profile.jpg",),),),
+                mSpacer(),
+
+                Expanded(flex: 4,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Morning"),
+                      Text("Sateesh Chauhan",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600),)
+                    ],
                   ),
-                  SizedBox(width: 10,),
-                  Expanded(flex: 7,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                Expanded(flex: 4,
+                  child:
+                  /*Container(
+                    width: 110,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      color: Color(0xffe6e9f8)
+                    ),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Morning"),
-                        Text("Sateesh Chauhan",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600),)
+                        Text("This month"),
+                        Icon(Icons.arrow_drop_down)
                       ],
                     ),
-                  ),
-                  Expanded(
-                    child:
-                    /*Container(
-                      width: 110,
-                      height: 35,
-                      decoration: BoxDecoration(
+                  ),*/
+                  OutlinedButton(
+                    onPressed: (){},
+                    child: Row(mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text('This Month',selectionColor: Colors.black,),
+                        Icon(Icons.keyboard_arrow_down_rounded,color: Colors.black,),
+                      ],
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
-                        color: Color(0xffe6e9f8)
                       ),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("This month"),
-                          Icon(Icons.arrow_drop_down)
-                        ],
-                      ),
-                    ),*/
-                    OutlinedButton(
-                      onPressed: (){},
-                      child: Row(
-                        children: [
-                          Text('This Month',selectionColor: Colors.black,),
-                          Icon(Icons.keyboard_arrow_down_rounded,color: Colors.black,),
-                        ],
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        backgroundColor: Color(0xffe6e9f8),
-                        side: BorderSide.none
-                      ),
-                    )
+                      backgroundColor: Color(0xffe6e9f8),
+                      side: BorderSide.none
+                    ),
                   )
-                ],
-              ),
+                )
+              ],
             ),
 
 
             /// expanse total container
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.all(16),
-                width: double.infinity,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Color(0xff6574d3),
-                  borderRadius: BorderRadius.circular(11)
-                ),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xff6574d3),
+                borderRadius: BorderRadius.circular(11)
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Expense total",
                         style: TextStyle(
@@ -133,231 +144,99 @@ class _HomePageState extends State<HomePage> {
                             ),)
                           ],
                         )
-              
+
                       ],
                     ),
-                    SizedBox(
-                        width: 125,
-                        child: Image(image: AssetImage("assets/images/expense_bg.png")))
-                  ],
-                ),
+                  ),
+
+                  /// side Image
+                  Expanded(child: Image.asset("assets/images/expense_bg.png", fit: BoxFit.contain,))
+                ],
               ),
             ),
 
             /// Expense list
 
-            Expanded(
-              child: Text("Expense List",style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w600
-              ),),
-            ),
+            Text("Expense List",style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w600
+            ),),
 
             /// Expense list using Listview
 
-            /*Expanded(
-              child: ListView(
-                children: [
-                  /// tuesday container
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(color: Colors.grey, width: 1)
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Text("Tuesday, 14",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600
-                            ),),
-                          trailing: Text("-\$1380",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600
-                            ),),
-                        ),
-                        Divider(
-                          indent: 15,endIndent: 15,),
-                        ListTile(
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Color(0xffe6e9f8)
-                            ),
-                            child: Icon(Icons.shopping_cart_outlined,
-                              color: Color(0xff6574d3),),
-                          ),
-                          title: Text('Shop',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
-                          subtitle: Text('Buy new clothes'),
-                          trailing: Text('-\$90',
-                            style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xffe78bbc)),),
-                        ),
-                        ListTile(
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Color(0xfffaebd3)
-                            ),
-                            child: Icon(Icons.phone_iphone,
-                              color: Colors.orangeAccent,),
-                          ),
-                          title: Text('Electronic',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
-                          subtitle: Text('Buy new iphone'),
-                          trailing: Text('-\$1290',
-                            style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xffe78bbc)),),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20,),
 
-                  /// monday container
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(color: Colors.grey, width: 1)
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Text("Monday, 13",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600
-                            ),),
-                          trailing: Text("-\$60",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600
-                            ),),
-                        ),
-                        Divider(
-                          indent: 15,endIndent: 15,),
-                        ListTile(
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Color(0xfffae6e7)
-                            ),
-                            child: Icon(Icons.shopping_cart_outlined,
-                              color: Colors.redAccent,),
-                          ),
-                          title: Text('Transportation',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 17
-                          ),),
-                          subtitle: Text('Trip to Malang'),
-                          trailing: Text('-\$60',
-                            style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xffe78bbc)),),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),*/
-            BlocBuilder<ExpenseBloc, ExpenseState>(builder: (_, state){
-              if(state is ExpenseLoadingState){
-                return Center(child: CircularProgressIndicator(),);
-              } else if(state is ExpenseErrorState) {
-                return Center(child: Text(state.errorMsg),);
-              } else if(state is ExpenseLoadedState){
-                return state.mExp.isNotEmpty ? ListView.builder(
-                  itemCount: state.mExp.length,
-                    itemBuilder: (_, index){
-
-                  var allExp = state.mExp;
-
-                  return Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(9),
-                            border: Border.all(color: Colors.grey, width: 1)
-                        ),
-                        child: Column(
-                          children: [
-                            ListTile(
-                              leading: Text("Tuesday, 14",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600
-                                ),),
-                              trailing: Text("-\$1380",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600
-                                ),),
-                            ),
-                            Divider(
-                              indent: 15,endIndent: 15,),
-                            ListTile(
-                              leading: Container(
+            Expanded(
+              child: BlocBuilder<ExpenseBloc, ExpenseState>(builder: (_, state){
+                if(state is ExpenseLoadingState){
+                  return Center(child: CircularProgressIndicator(),);
+                } else if(state is ExpenseErrorState) {
+                  return Center(child: Text(state.errorMsg),);
+                } else if(state is ExpenseLoadedState){
+                  return state.mExp.isNotEmpty ? ListView.builder(
+                    itemCount: state.mExp.length,
+                      itemBuilder: (_, index){
+              
+                    var allExp = state.mExp;
+                    
+                    return Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        children: [
+                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              /// image box
+                              Container(
                                 height: 40,
                                 width: 40,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: Color(0xffe6e9f8)
+                                  color: Color(0xFFe0e0e0),
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                                child: Icon(Icons.shopping_cart_outlined,
-                                  color: Color(0xff6574d3),),
-                              ),
-                              title: Text(allExp[index].title,
-                                style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
-
-                              subtitle: Text(allExp[index].desc),
-
-                              trailing: Text('-\$${allExp[index].amount}',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xffe78bbc)),),
-                            ),
-                            ListTile(
-                              leading: Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: Color(0xfffaebd3)
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Image.asset(AppConstants.mCat.where((exp){
+                                    return exp.id==allExp[index].categoryId;
+                                  }).toList()[0].imgPath, fit: BoxFit.contain,
+                                  height: 35,width: 35,),
                                 ),
-                                child: Icon(Icons.phone_iphone,
-                                  color: Colors.orangeAccent,),
                               ),
-                              title: Text('Electronic',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
-                              subtitle: Text('Buy new iphone'),
-                              trailing: Text('-\$1290',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xffe78bbc)),),
-                            ),
-                          ],
-                        ),
+                              mSpacer(),
+                              Expanded(flex: 2,
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(allExp[index].title,
+                                      style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500),),
+                                    Text(allExp[index].desc)
+                                  ],
+                                ),
+                              ),
+                              mSpacer(),
+                              Expanded(
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(dFormat.format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          (int.parse(allExp[index].createdAt)
+                                          )
+                                      )
+                                  )
+                                  ),
+                                  Text("-\$ ${allExp[index].amount}",
+                                    style: TextStyle(fontSize: 18, color: Colors.pinkAccent),)
+                                ],),
+                              ),
+                            ],
+                          ),
+                          Divider()
+                        ],
                       ),
-                    ],
-                  );
-                }) : Center(child: Text("No expenses yet!!"),);
-              }
-
-              return Container();
-            })
+                    );
+                  }) : Center(child: Text("No expenses yet!!"),);
+                }
+              
+                return Container();
+              }),
+            )
 
 
             /*Container(
@@ -567,3 +446,192 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+/// first time container
+/*Expanded(
+              child: ListView(
+                children: [
+                  /// tuesday container
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(color: Colors.grey, width: 1)
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Text("Tuesday, 14",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600
+                            ),),
+                          trailing: Text("-\$1380",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600
+                            ),),
+                        ),
+                        Divider(
+                          indent: 15,endIndent: 15,),
+                        ListTile(
+                          leading: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Color(0xffe6e9f8)
+                            ),
+                            child: Icon(Icons.shopping_cart_outlined,
+                              color: Color(0xff6574d3),),
+                          ),
+                          title: Text('Shop',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+                          subtitle: Text('Buy new clothes'),
+                          trailing: Text('-\$90',
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xffe78bbc)),),
+                        ),
+                        ListTile(
+                          leading: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Color(0xfffaebd3)
+                            ),
+                            child: Icon(Icons.phone_iphone,
+                              color: Colors.orangeAccent,),
+                          ),
+                          title: Text('Electronic',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+                          subtitle: Text('Buy new iphone'),
+                          trailing: Text('-\$1290',
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xffe78bbc)),),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+
+                  /// monday container
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(color: Colors.grey, width: 1)
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Text("Monday, 13",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600
+                            ),),
+                          trailing: Text("-\$60",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600
+                            ),),
+                        ),
+                        Divider(
+                          indent: 15,endIndent: 15,),
+                        ListTile(
+                          leading: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Color(0xfffae6e7)
+                            ),
+                            child: Icon(Icons.shopping_cart_outlined,
+                              color: Colors.redAccent,),
+                          ),
+                          title: Text('Transportation',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 17
+                          ),),
+                          subtitle: Text('Trip to Malang'),
+                          trailing: Text('-\$60',
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xffe78bbc)),),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),*/
+
+/// previous container listview
+/*Container(
+                            height : 30,
+                            width : 30,
+                            decoration: BoxDecoration(
+                                color: Color(0xFFe0e0e0),
+                                borderRadius: BorderRadius.circular(9),
+                                // border: Border.all(color: Colors.grey, width: 1)
+                            ),
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  leading: Text("Tuesday, 14",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600
+                                    ),),
+                                  trailing: Text("-\$1380",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600
+                                    ),),
+                                ),
+                                Divider(
+                                  indent: 15,endIndent: 15,),
+                                ListTile(
+                                  leading: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Color(0xffe6e9f8)
+                                    ),
+                                    child: Icon(Icons.shopping_cart_outlined,
+                                      color: Color(0xff6574d3),),
+                                  ),
+                                  title: Text(allExp[index].title,
+                                    style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+
+                                  subtitle: Text(allExp[index].desc),
+
+                                  trailing: Text('-\$${allExp[index].amount}',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: Color(0xffe78bbc)),),
+                                ),
+                                ListTile(
+                                  leading: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Color(0xfffaebd3)
+                                    ),
+                                    child: Icon(Icons.phone_iphone,
+                                      color: Colors.orangeAccent,),
+                                  ),
+                                  title: Text('Electronic',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+                                  subtitle: Text('Buy new iphone'),
+                                  trailing: Text('-\$1290',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: Color(0xffe78bbc)),),
+                                ),
+                              ],
+                            ),
+                          )*/
